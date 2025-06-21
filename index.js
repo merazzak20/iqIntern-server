@@ -21,8 +21,28 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    // Collection
+    const database = client.db("iqIntern_DB");
+    const feedbackCollection = database.collection("feedbacks");
+    const messageCollection = database.collection("messages");
+
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
+
+    /***********************
+      Message related API
+    ************************/
+    app.get("/messages", async (req, res) => {
+      const result = await messageCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.post("/messages", async (req, res) => {
+      const message = req.body;
+      const result = await messageCollection.insertOne(message);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -30,7 +50,7 @@ async function run() {
     );
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
