@@ -5,7 +5,19 @@ const cors = require("cors");
 const port = process.env.PORT || 5000;
 const app = express();
 
-app.use(cors());
+// middleware
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    // "https://portfolio2-tawny-eight.vercel.app",
+    // "https://my-portfolio-f17dc.web.app",
+  ],
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.19nebqa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -25,6 +37,7 @@ async function run() {
     const database = client.db("iqIntern_DB");
     const feedbackCollection = database.collection("feedbacks");
     const messageCollection = database.collection("messages");
+    const applicationCollection = database.collection("applications");
 
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
@@ -54,6 +67,15 @@ async function run() {
     app.post("/feedbacks", async (req, res) => {
       const feedback = req.body;
       const result = await feedbackCollection.insertOne(feedback);
+      res.send(result);
+    });
+
+    /***********************
+      Feedback related API
+    ************************/
+    app.post("/applications", async (req, res) => {
+      const application = req.body;
+      const result = await applicationCollection.insertOne(application);
       res.send(result);
     });
 
